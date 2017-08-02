@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
 
     public Transform homeParent = null;
+    public int homeIndex = 0;
     public Transform placeHolderParent = null;
     public GameObject placeHolder = null;
 
@@ -14,10 +15,11 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     public Type type = Type.DEFAULT;
 
 	public void OnBeginDrag(PointerEventData eventData) {
-		// Debug.Log ("OnBeginDrag");
+		// Debug.Log("OnBeginDrag");
 
         homeParent = this.transform.parent;
         placeHolderParent = homeParent;
+        homeIndex = this.transform.GetSiblingIndex();
 
         placeHolder = new GameObject();
         placeHolder.transform.SetParent(placeHolderParent);
@@ -31,46 +33,53 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
         this.transform.SetParent(this.transform.parent.parent);
 
-        GetComponent<CanvasGroup>().blocksRaycasts = false;
+        this.GetComponent<CanvasGroup>().blocksRaycasts = false;
 	}
 
 	public void OnDrag(PointerEventData eventData) {
-		// Debug.Log ("OnDrag");
+		// Debug.Log("OnDrag");
 
         this.transform.position = eventData.position;
 
         if (placeHolder.transform.parent != placeHolderParent)
             placeHolder.transform.SetParent(placeHolderParent);
 
-        int newSiblingIndex = placeHolderParent.childCount;
-        for (int i = 0; i < placeHolderParent.childCount; i++) {
-            if (this.transform.position.x < placeHolderParent.GetChild(i).position.x) {
-                newSiblingIndex = i;
+        if (placeHolderParent) {
+            int newSiblingIndex = placeHolderParent.childCount;
+            for (int i = 0; i < placeHolderParent.childCount; i++) {
+                if (this.transform.position.x < placeHolderParent.GetChild(i).position.x) {
+                    newSiblingIndex = i;
 
-                if (placeHolder.transform.GetSiblingIndex() < newSiblingIndex)
-                    i--;
+                    if (placeHolder.transform.GetSiblingIndex() < newSiblingIndex)
+                        i--;
 
-                break;
+                    break;
+                }
             }
+            placeHolder.transform.SetSiblingIndex(newSiblingIndex);
         }
-        placeHolder.transform.SetSiblingIndex(newSiblingIndex);
 	}
 
 	public void OnEndDrag(PointerEventData eventData) {
-		// Debug.Log ("OnEndDrag");
+		// Debug.Log("OnEndDrag");
 
         this.transform.SetParent(homeParent);
-        this.transform.SetSiblingIndex(placeHolder.transform.GetSiblingIndex());
-        GetComponent<CanvasGroup>().blocksRaycasts = true;
+        if (placeHolderParent)
+            this.transform.SetSiblingIndex(placeHolder.transform.GetSiblingIndex());
+        else
+            this.transform.SetSiblingIndex(homeIndex);
+        this.GetComponent<CanvasGroup>().blocksRaycasts = true;
 
         Destroy(placeHolder);
 	}
 
-	// Use this for initialization
+	/* Use this for initialization */
 	void Start () {
 	}
 
-	// Update is called once per frame
+	/* Update is called once per frame */
 	void Update () {
+        // if (this.placeHolder)
+        //     Debug.Log("index: " + this.placeHolder.transform.GetSiblingIndex());
 	}
 }

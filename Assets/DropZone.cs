@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler {
 
     public Draggable.Type type = Draggable.Type.DEFAULT;
+    public bool usePlaceHolder = true;
 
     public void OnPointerEnter(PointerEventData eventData) {
         // Debug.Log ("OnPointerEnter to " + gameObject.name);
@@ -16,7 +17,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         if (d != null) {
             /* Only accept draggables of filtered type but let DEFAULT drop zones accept all */
             if (d.type == this.type || this.type == Draggable.Type.DEFAULT)
-                d.placeHolderParent = this.transform;
+                d.placeHolderParent = usePlaceHolder ? this.transform : null;
         }
     }
 
@@ -26,10 +27,11 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         if (eventData.pointerDrag == null) return;
 
         Draggable d = eventData.pointerDrag.GetComponent<Draggable>();
-        if (d != null && d.placeHolderParent == this.transform) {
+        if (d != null && (d.placeHolderParent == null || d.placeHolderParent == this.transform)) {
             /* Only accept draggables of filtered type but let DEFAULT drop zones accept all */
             if (d.type == this.type || this.type == Draggable.Type.DEFAULT)
                 d.homeParent = this.transform;
+                d.homeIndex = usePlaceHolder ? d.transform.GetSiblingIndex() : this.transform.childCount;
         }
     }
 
@@ -42,7 +44,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         if (d != null) {
             /* Only accept draggables of filtered type but let DEFAULT drop zones accept all */
             if (d.type == this.type || this.type == Draggable.Type.DEFAULT)
-                d.placeHolderParent = d.homeParent;
+                d.placeHolderParent = null;
         }
     }
 }
