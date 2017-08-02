@@ -461,6 +461,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
+  usePlaceHolder: 0
 --- !u!114 &661717670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1048,6 +1049,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 0
+  usePlaceHolder: 1
 --- !u!114 &1832512857
 MonoBehaviour:
   m_ObjectHideFlags: 0
